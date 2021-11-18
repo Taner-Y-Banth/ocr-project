@@ -9,7 +9,7 @@ const completed = []
 
 fs.watch('./images', async (eventType, filename) => {
   console.log(`event type is: ${eventType}`);
-  if (filename.endsWith(".jpg") && !completed.includes(filename) && eventType == 'change') {
+  if (!completed.includes(filename) && eventType == 'change') {
     completed.push(filename)
     console.log(`filename provided: ${filename}`);
     const worker = createWorker({
