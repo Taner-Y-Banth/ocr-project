@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
+    "jimp": "^0.16.1",
     "nstrumenta": "^1.0.37",
     "tesseract.js": "^2.1.5"
   },

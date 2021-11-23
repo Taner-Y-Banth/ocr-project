@@ -3,15 +3,24 @@ import ws from 'ws';
 import { NstrumentaClient } from 'nstrumenta';
 import fs from 'fs';
 import { readFile } from 'fs/promises';
+import jimp from 'jimp';
 
 const nstrumenta = new NstrumentaClient({ hostUrl: 'ws://localhost:8088' });
 const completed = []
 
 fs.watch('./images', async (eventType, filename) => {
-  console.log(`event type is: ${eventType}`);
-  if (!completed.includes(filename) && eventType == 'change') {
+  console.log(!completed.includes(filename) && `event type is: ${eventType}`);
+  if (eventType == 'change') {
     completed.push(filename)
     console.log(`filename provided: ${filename}`);
+
+    async function main() {
+      const image = await jimp.read(`./images/${filename}`);
+      image.threshold({ max: 200, replace: 200, autoGreyscale: true });
+    }
+
+    main();
+
     const worker = createWorker({
       logger: m => console.log(m)
     });
@@ -26,6 +35,7 @@ fs.watch('./images', async (eventType, filename) => {
     console.log(text);
     nstrumenta.send('ocr', text);
     fs.rm('./eng.traineddata', () => { });
+    fs.rm(`./images/${filename}`, () => { });
   } else {
     console.log('filename not provided');
   }
