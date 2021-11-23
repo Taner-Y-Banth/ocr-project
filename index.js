@@ -1,9 +1,9 @@
-import { createWorker } from 'tesseract.js';
-import ws from 'ws';
-import { NstrumentaClient } from 'nstrumenta';
-import fs from 'fs';
-import { readFile } from 'fs/promises';
 import jimp from 'jimp';
+import ws from 'ws';
+import fs from 'fs';
+import { createWorker } from 'tesseract.js';
+import { NstrumentaClient } from 'nstrumenta'
+import { readFile } from 'fs/promises';
 
 const nstrumenta = new NstrumentaClient({ hostUrl: 'ws://localhost:8088' });
 const completed = []
