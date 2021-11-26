@@ -3,8 +3,6 @@ import ws from 'ws';
 import fs from 'fs';
 import { createWorker } from 'tesseract.js';
 import { NstrumentaClient } from 'nstrumenta'
-import { readFile } from 'fs/promises';
-let previousBlob = ''
 
 const nstrumenta = new NstrumentaClient({ hostUrl: 'ws://localhost:8088' });
 
@@ -28,7 +26,6 @@ nstrumenta.addListener("open", () => {
     await worker.load();
     await worker.loadLanguage(languageFile);
     await worker.initialize(languageFile);
-    // const imageFile = await readFile();
     const { data: { text } } = await worker.recognize(blob);
     console.log(text);
     await worker.terminate();
