@@ -8,12 +8,13 @@ const nstrumenta = new NstrumentaClient({ hostUrl: 'ws://localhost:8088' });
 
 nstrumenta.addListener("open", () => {
   console.log("websocket successfully opened")
+
   nstrumenta.subscribe('ocr', async (message) => {
 
     const blob = message
 
     async function main() {
-      const image = await jimp.read(blob);
+      const image = await jimp.read(img);
       image.threshold({ max: 200, replace: 200, autoGreyscale: true });
     }
 
@@ -26,7 +27,7 @@ nstrumenta.addListener("open", () => {
     await worker.load();
     await worker.loadLanguage(languageFile);
     await worker.initialize(languageFile);
-    const { data: { text } } = await worker.recognize(blob);
+    const { data: { text } } = await worker.recognize(img);
     console.log(text);
     await worker.terminate();
     console.log(text);
