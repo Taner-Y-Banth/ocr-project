@@ -8,9 +8,9 @@ const nstrumenta = new NstrumentaClient({ hostUrl: 'ws://localhost:8088' });
 
 nstrumenta.addListener("open", () => {
   console.log("websocket successfully opened")
-  nstrumenta.subscribe('ocr', async (blob) => {
-    
-    console.log(blob)
+  nstrumenta.subscribe('ocr', async (message) => {
+
+    const blob = message
 
     async function main() {
       const image = await jimp.read(blob);
