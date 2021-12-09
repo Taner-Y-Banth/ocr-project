@@ -14,7 +14,7 @@ nstrumenta.addListener("open", () => {
     const blob = message
 
     async function main() {
-      const image = await jimp.read(img);
+      const image = await jimp.read(blob);
       image.threshold({ max: 200, replace: 200, autoGreyscale: true });
     }
 
@@ -27,7 +27,7 @@ nstrumenta.addListener("open", () => {
     await worker.load();
     await worker.loadLanguage(languageFile);
     await worker.initialize(languageFile);
-    const { data: { text } } = await worker.recognize(img);
+    const { data: { text } } = await worker.recognize(blob);
     console.log(text);
     await worker.terminate();
     console.log(text);
