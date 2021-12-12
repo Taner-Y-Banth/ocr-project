@@ -8,24 +8,24 @@ import { NstrumentaClient } from 'nstrumenta'
 const argv = minimist(process.argv.slice(2));
 const wsUrl = argv.wsUrl;
 
-const nstrumenta = new NstrumentaClient({
+const nstClient = new NstrumentaClient({
   apiKey: "",
   projectId: "",
   wsUrl,
 });
 
-nstrumenta.addListener("open", () => {
+nstClient.addListener("open", () => {
   console.log("websocket successfully opened")
 
-  nstrumenta.subscribe('ocr', async (message) => {
+  nstClient.subscribe('ocr', async (message) => {
 
     const blob = message
 
     async function main() {
       const image = await jimp.read(blob);
-      image.threshold({ max: 200, replace: 200, autoGreyscale: true });
+      const outImage = await image.invert().getBufferAsync(jimp.MIME_PNG);
+      nstClient.sendBuffer('jimp', outImage);
     }
-
     main();
 
     const worker = createWorker({
@@ -35,21 +35,21 @@ nstrumenta.addListener("open", () => {
     await worker.load();
     await worker.loadLanguage(languageFile);
     await worker.initialize(languageFile);
-    const { data: { text } } = await worker.recognize(blob);
+    const { data: { text } } = await worker.recognize(outImage);
     console.log(text);
     await worker.terminate();
     console.log(text);
-    nstrumenta.send('images', text);
+    nstClient.send('images', text);
     fs.rm('./eng.traineddata', () => { });
   });
 
-  nstrumenta.addListener("open", () => {
+  nstClient.addListener("open", () => {
     console.log("websocket successfully opened")
-    nstrumenta.subscribe('ocr', () => {
+    nstClient.subscribe('ocr', () => {
     })
   });
 })
 
-console.log("nstrumenta init")
+console.log("nstClient init")
 
-nstrumenta.init(ws);
+nstClient.init(ws);
