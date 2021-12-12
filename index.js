@@ -1,10 +1,18 @@
 import jimp from 'jimp';
 import ws from 'ws';
 import fs from 'fs';
+import minimist from 'minimist';
 import { createWorker } from 'tesseract.js';
 import { NstrumentaClient } from 'nstrumenta'
 
-const nstrumenta = new NstrumentaClient({ hostUrl: 'ws://localhost:8088' });
+const argv = minimist(process.argv.slice(2));
+const wsUrl = argv.wsUrl;
+
+const nstrumenta = new NstrumentaClient({
+  apiKey: "",
+  projectId: "",
+  wsUrl,
+});
 
 nstrumenta.addListener("open", () => {
   console.log("websocket successfully opened")
