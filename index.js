@@ -19,14 +19,9 @@ nstClient.addListener("open", () => {
 
   nstClient.subscribe('ocr', async (message) => {
 
-    const blob = message
-
-    async function main() {
-      const image = await jimp.read(blob);
-      const outImage = await image.invert().getBufferAsync(jimp.MIME_PNG);
-      nstClient.sendBuffer('jimp', outImage);
-    }
-    main();
+    const image = await jimp.read(message);
+    const outImage = await image.invert().getBufferAsync(jimp.MIME_PNG);
+    nstClient.sendBuffer('jimp', outImage);
 
     const worker = createWorker({
       logger: m => console.log(m)
@@ -36,7 +31,6 @@ nstClient.addListener("open", () => {
     await worker.loadLanguage(languageFile);
     await worker.initialize(languageFile);
     const { data: { text } } = await worker.recognize(outImage);
-    console.log(text);
     await worker.terminate();
     console.log(text);
     nstClient.send('images', text);
