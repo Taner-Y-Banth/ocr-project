@@ -14,12 +14,10 @@ fs.watch('./images', async (eventType, filename) => {
     completed.push(filename)
     console.log(`filename provided: ${filename}`);
 
-    async function main() {
-      const image = await jimp.read(`./images/${filename}`);
-      image.threshold({ max: 200, replace: 200, autoGreyscale: true });
-    }
+    const screenshot = await readFile(`./images/${filename}`);
 
-    main();
+    const image = await jimp.read(`./images/${filename}`);
+    const outImage = await image.invert().getBufferAsync(jimp.MIME_PNG);
 
     const worker = createWorker({
       logger: m => console.log(m)
@@ -28,8 +26,7 @@ fs.watch('./images', async (eventType, filename) => {
     await worker.load();
     await worker.loadLanguage(languageFile);
     await worker.initialize(languageFile);
-    const imageFile = await readFile(`./images/${filename}`);
-    const { data: { text } } = await worker.recognize(imageFile);
+    const { data: { text } } = await worker.recognize(outImage ? outImage : screenshot);
     console.log(text);
     await worker.terminate();
     console.log(text);
