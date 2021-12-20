@@ -1,4 +1,3 @@
-import jimp from 'jimp';
 import ws from 'ws';
 import fs from 'fs';
 import minimist from 'minimist';
@@ -17,11 +16,7 @@ const nstClient = new NstrumentaClient({
 nstClient.addListener("open", () => {
   console.log("websocket successfully opened")
 
-  nstClient.subscribe('ocr', async (message) => {
-
-    const image = await jimp.read(message);
-    const outImage = await image.invert().getBufferAsync(jimp.MIME_PNG);
-    nstClient.sendBuffer('jimp', outImage);
+  nstClient.subscribe('jimp', async (message) => {
 
     const worker = createWorker({
       logger: m => console.log(m)
@@ -30,10 +25,26 @@ nstClient.addListener("open", () => {
     await worker.load();
     await worker.loadLanguage(languageFile);
     await worker.initialize(languageFile);
-    const { data: { text } } = await worker.recognize(outImage);
+    const { data: { text } } = await worker.recognize(message);
     await worker.terminate();
     console.log(text);
-    nstClient.send('images', text);
+    nstClient.send('jimpText', text);
+    fs.rm('./eng.traineddata', () => { });
+  }),
+
+  nstClient.subscribe('ocr', async (message) => {
+
+    const worker = createWorker({
+      logger: m => console.log(m)
+    });
+    const languageFile = 'eng'
+    await worker.load();
+    await worker.loadLanguage(languageFile);
+    await worker.initialize(languageFile);
+    const { data: { text } } = await worker.recognize(message);
+    await worker.terminate();
+    console.log(text);
+    nstClient.send('text', text);
     fs.rm('./eng.traineddata', () => { });
   });
 
