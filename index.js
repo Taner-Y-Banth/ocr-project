@@ -5,7 +5,7 @@ import { createWorker } from 'tesseract.js';
 import { NstrumentaClient } from 'nstrumenta'
 
 const argv = minimist(process.argv.slice(2));
-const wsUrl = argv.wsUrl;
+const wsUrl = 'wss://' + argv.wsUrl;
 
 const nstClient = new NstrumentaClient({
   apiKey: "",
